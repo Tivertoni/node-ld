@@ -11,12 +11,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "async": "^3.2.2",
-    "debug": "^4.3.2",
-    "node-hid": "^2.1.1",
-    "pad": "^3.2.0",
-    "serialport": "^9.2.5",
-    "usb": "2.0.0-alpha.2"
+    "async": "^3.2.6",
+    "debug": "^4.4.1",
+    "node-hid": "^3.1.2",
+    "pad": "^3.3.0",
+    "serialport": "^13.0.0",
+    "usb": "^2.15.0"
   },
   "browser": {
     "node.js": "browser.js",
