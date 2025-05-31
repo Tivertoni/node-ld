@@ -21,12 +21,11 @@ export default class Event {
   }
 
   build() {
-    var b = new Buffer(11);
-    b[0] = this.pad || 0;
-    b[1] = 0;
-    b[2] = this.index || 0;
+    var b = Buffer.alloc(11);
+    b[0] = this.pad;
+    b[2] = this.index;
     b[3] = this.dir & 0x1;
-    var uid = new Buffer(this.uid, "hex");
+    var uid = Buffer.from(this.uid, "hex");
     uid.copy(b, 4);
     // 0b04a3bdfa54428001100000e6
     this.frame = this.frame || new Frame();

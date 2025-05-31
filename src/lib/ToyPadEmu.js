@@ -23,7 +23,7 @@ export default class ToyPadEmu extends EventEmitter {
     this._evqueue = [];
     this.burtle = new Burtle();
     this.tea = new TEA();
-    this.tea.key = new Buffer([
+    this.tea.key = Buffer.from([
       0x55, 0xfe, 0xf6, 0xb0, 0x62, 0xbf, 0x0b, 0x41, 0xc9, 0xb3, 0x7c, 0xb4,
       0x97, 0x3e, 0x29, 0x7b,
     ]);
@@ -103,7 +103,7 @@ export default class ToyPadEmu extends EventEmitter {
   processRequest(req) {
     var res = new Response();
     res.cid = req.cid;
-    res.payload = new Buffer(0);
+    res.payload = Buffer.allocUnsafe(0);
     var active = (h) => h.cmd == req.cmd || h.cmd == 0;
     this._hooks.filter(active).forEach((h) => h.cb(req, res));
     if (res._cancel) return;
@@ -141,7 +141,7 @@ export default class ToyPadEmu extends EventEmitter {
   }
 
   randomUID() {
-    var uid = new Buffer(7);
+    var uid = Buffer.alloc(7);
     uid[0] = 0x04; // vendor id 04 = NXP
     uid[6] = 0x80; // for whatever reason the last byte of the UID is mostly 0x8*
     for (var i = 1; i < 6; i++) uid[i] = Math.round(Math.random() * 256) % 256;
@@ -151,7 +151,7 @@ export default class ToyPadEmu extends EventEmitter {
   registerDefaults() {
     this._hook(this.CMD_WAKE, (req, res) => {
       console.log("REQUEST (CMD_WAKE)");
-      res.payload = new Buffer("286329204c45474f2032303134", "hex");
+      res.payload = Buffer.from("286329204c45474f2032303134", "hex");
       this._tokens.forEach((ev) => this.tagPlaceEvent(ev));
     });
 
@@ -159,7 +159,7 @@ export default class ToyPadEmu extends EventEmitter {
       var ind = req.payload[0];
       var page = req.payload[1];
       console.log("REQUEST (CMD_READ): index:", ind, "page", page);
-      res.payload = new Buffer(17);
+      res.payload = Buffer.alloc(17);
       res.payload[0] = 0;
       var start = page * 4;
       var token = this._tokens.find((t) => t.index == ind);
@@ -174,9 +174,9 @@ export default class ToyPadEmu extends EventEmitter {
       console.log("REQUEST (CMD_MODEL): index:", index, "conf:", conf);
       var token = this._tokens.find((t) => t.index == index);
       //console.log(token)
-      var buf = new Buffer(8);
+      var buf = Buffer.alloc(8);
       buf.writeUInt32BE(conf, 4);
-      res.payload = new Buffer(9);
+      res.payload = Buffer.alloc(9);
       if (token)
         if (token.token.id) buf.writeUInt32LE(token.token.id || 0, 0);
         else res.payload[0] = 0xf9;
@@ -191,7 +191,7 @@ export default class ToyPadEmu extends EventEmitter {
       var conf = req.payload.readUInt32BE(4);
       this.burtle.init(seed);
       console.log("REQUEST (CMD_SEED): seed:", seed, "conf", conf);
-      res.payload = new Buffer(8);
+      res.payload = Buffer.alloc(8);
       res.payload.fill(0);
       res.payload.writeUInt32BE(conf, 0);
       res.payload = this.encrypt(res.payload);
@@ -202,7 +202,7 @@ export default class ToyPadEmu extends EventEmitter {
 
       var conf = req.payload.readUInt32BE(0);
       console.log("REQUEST (CMD_CHAL): conf:", conf);
-      res.payload = new Buffer(8);
+      res.payload = Buffer.alloc(8);
       var rand = this.burtle.rand();
       //console.log('RNG',rand.toString(16))
       res.payload.writeUInt32LE(rand, 0);

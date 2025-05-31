@@ -1,5 +1,6 @@
 function flipBytes(buf) {
-  var out = new Buffer(buf.length);
+  //TODO: Move to Utils.js
+  var out = Buffer.alloc(buf.length);
   for (var i = 0; i < buf.length; i += 4)
     out.writeUInt32BE(buf.readUInt32LE(i) >>> 0, i);
   return out;
@@ -10,7 +11,7 @@ export default class TEA {
 
   encrypt(buffer) {
     if (!this.key) throw new Error("set key before using");
-    var buf = new Buffer(8);
+    var buf = Buffer.alloc(8);
     var d1 = buffer.readInt32LE(0);
     var d2 = buffer.readInt32LE(4);
     var keya = [
@@ -27,7 +28,7 @@ export default class TEA {
 
   decrypt(buffer) {
     if (!this.key) throw new Error("set key before using");
-    var buf = new Buffer(8);
+    var buf = Buffer.alloc(8);
     var d1 = buffer.readUInt32LE(0);
     var d2 = buffer.readUInt32LE(4);
     var keya = [

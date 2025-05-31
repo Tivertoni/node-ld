@@ -3,7 +3,7 @@ export default class Tag {
     this.TAG_SIZE = 180;
     this.PAGE_SIZE = 4;
     this.PAGES_PER_READ = 4;
-    this.data = data || new Buffer(this.TAG_SIZE);
+    this.data = data || Buffer.alloc(this.TAG_SIZE);
   }
 
   get uid() {

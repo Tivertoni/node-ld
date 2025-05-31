@@ -1,8 +1,8 @@
 var rotr32 = (a, b) => ((a >>> b) | (a << (32 - b))) >>> 0;
 var debug = false;
 export default function pwdgen(uid) {
-  uid = new Buffer(uid, "hex");
-  var base = new Buffer("UUUUUUU(c) Copyright LEGO 2014AA");
+  uid = Buffer.from(uid, "hex");
+  var base = Buffer.from("UUUUUUU(c) Copyright LEGO 2014AA");
   uid.copy(base);
   base[30] = base[31] = 0xaa;
 
@@ -24,7 +24,7 @@ export default function pwdgen(uid) {
     }
   }
 
-  var b = new Buffer(4);
+  var b = Buffer.allocUnsafe(4); //TODO: THis can be optimized
   b.writeUInt32BE(v2, 0);
   v2 = b.readUInt32LE(0);
   return ("00000000" + v2.toString(16)).slice(-8);

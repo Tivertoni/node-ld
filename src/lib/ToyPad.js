@@ -94,26 +94,25 @@ export default class ToyPad extends EventEmitter {
   }
 
   wake(cb) {
-    this.request(this.CMD_WAKE, new Buffer("(c) LEGO 2014"), cb);
+    this.request(this.CMD_WAKE, Buffer.from("(c) LEGO 2014"), cb);
   }
 
   seed(seed, cb) {
     this.burtle.init(seed);
-    var b = new Buffer(8);
-    b.fill(0);
+    var b = Buffer.alloc(8);
+
     b.writeUInt32BE(seed, 0);
     this.request(this.CMD_SEED, b, cb);
   }
 
   chal(data, cb) {
-    var b = new Buffer(8);
-    b.fill(0);
+    var b = Buffer.alloc(8);
     this.request(this.CMD_CHAL, b, cb);
   }
 
   color(p, rgb, cb) {
     rgb = hextorgb(rgb);
-    this.request(this.CMD_COL, new Buffer([p, rgb.r, rgb.g, rgb.b]), cb);
+    this.request(this.CMD_COL, Buffer.from([p, rgb.r, rgb.g, rgb.b]), cb);
   }
 
   colorAll(rgb1, rgb2, rgb3, cb) {
@@ -122,7 +121,7 @@ export default class ToyPad extends EventEmitter {
     rgb3 = hextorgb(rgb3);
     this.request(
       this.CMD_COLAL,
-      new Buffer([
+      Buffer.from([
         1,
         rgb1.r,
         rgb1.g,
@@ -142,16 +141,20 @@ export default class ToyPad extends EventEmitter {
 
   getPadColor(pad, cb) {
     // Subtract 1 here to match the Pad values used in color (1,2,3)
-    this.request(this.CMD_GETCOL, new Buffer([pad - 1]), cb);
+    this.request(this.CMD_GETCOL, Buffer.from([pad - 1]), cb);
   }
 
   fade(p, s, c, rgb, cb) {
     rgb = hextorgb(rgb);
-    this.request(this.CMD_FADE, new Buffer([p, s, c, rgb.r, rgb.g, rgb.b]), cb);
+    this.request(
+      this.CMD_FADE,
+      Buffer.from([p, s, c, rgb.r, rgb.g, rgb.b]),
+      cb
+    );
   }
 
   fadeRandom(p, s, c, cb) {
-    this.request(this.CMD_FADRD, new Buffer([p, s, c]), cb);
+    this.request(this.CMD_FADRD, Buffer.from([p, s, c]), cb);
   }
 
   fadeAll(s1, c1, rgb1, s2, c2, rgb2, s3, c3, rgb3, cb) {
@@ -160,7 +163,7 @@ export default class ToyPad extends EventEmitter {
     rgb3 = hextorgb(rgb3);
     this.request(
       this.CMD_FADAL,
-      new Buffer([
+      Buffer.from([
         1,
         s1,
         c1,
@@ -189,7 +192,7 @@ export default class ToyPad extends EventEmitter {
     offRGB = hextorgb(offRGB);
     this.request(
       this.CMD_FLASH,
-      new Buffer([
+      Buffer.from([
         pad,
         onoff[0],
         onoff[1],
@@ -208,7 +211,7 @@ export default class ToyPad extends EventEmitter {
     rgb3 = hextorgb(rgb3);
     this.request(
       this.CMD_FLSAL,
-      new Buffer([
+      Buffer.from([
         1,
         onoff1[0],
         onoff1[1],
@@ -236,15 +239,15 @@ export default class ToyPad extends EventEmitter {
   }
 
   tagList(cb) {
-    this.request(this.CMD_TGLST, new Buffer([]), cb);
+    this.request(this.CMD_TGLST, Buffer.allocUnsafe(0), cb);
   }
 
   read(index, page, cb) {
-    this.request(this.CMD_READ, new Buffer([index, page]), cb);
+    this.request(this.CMD_READ, Buffer.from([index, page]), cb);
   }
 
   write(index, page, data, cb) {
-    var buf = new Buffer(6);
+    var buf = Buffer.alloc(6);
     buf[0] = index;
     buf[1] = page;
     data.copy(buf, 2);
@@ -261,9 +264,10 @@ export default class ToyPad extends EventEmitter {
   // The index argument appears to not function properly (it will error if there is no tag on given index), but some indexes are always valid such as 84, if anyone knows why...
   // The effect is global until another PWD change
   pwd(type, pwd, cb) {
-    var buf = new Buffer(6);
-    if (type < 2) buf.fill(0);
-    else pwd.copy(buf, 2);
+    var buf = Buffer.alloc(6);
+    if (type >= 2) {
+      pwd.copy(buf, 2);
+    }
     buf[0] = 84; //Possible tag index?
     buf[1] = type;
     this.request(this.CMD_PWD, buf, cb);
@@ -272,8 +276,8 @@ export default class ToyPad extends EventEmitter {
   // This appears to halt NFC operations until another read/write/pause is called.
   // State values: true, false
   active(state, cb) {
-    if (state) this.request(this.CMD_ACTIVE, new Buffer([1]), cb);
-    else this.request(this.CMD_ACTIVE, new Buffer([0]), cb);
+    if (state) this.request(this.CMD_ACTIVE, Buffer.alloc([1]), cb);
+    else this.request(this.CMD_ACTIVE, Buffer.allocUnsafe([0]), cb);
   }
 }
 function hextorgb(hex) {

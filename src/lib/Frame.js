@@ -11,8 +11,8 @@ export default class Frame {
   }
 
   build() {
-    var buf = new Buffer(32);
-    buf.fill(0);
+    var buf = Buffer.alloc(32);
+
     buf[0] = this.type;
     buf[1] = this.payload.length;
     this.payload.copy(buf, 2);

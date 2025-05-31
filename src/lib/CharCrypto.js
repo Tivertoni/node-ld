@@ -5,7 +5,7 @@ var rotr32 = (a, b) => ((a >>> b) | (a << (32 - b))) >>> 0;
 var debug = false;
 export default class CharCrypto {
   genkey(uid) {
-    return new Buffer(
+    return Buffer.from(
       this.scramble(uid, 3) +
         this.scramble(uid, 4) +
         this.scramble(uid, 5) +
@@ -16,25 +16,25 @@ export default class CharCrypto {
   encrypt(uid, charid) {
     var tea = new TEA();
     tea.key = this.genkey(uid);
-    var buf = new Buffer(8);
+    var buf = Buffer.alloc(8);
     buf.writeUInt32LE(charid, 0);
     buf.writeUInt32LE(charid, 4);
     var ret = tea.encrypt(buf);
     return process.browser ? ret.toString("hex") : ret;
   }
   decrypt(uid, data) {
-    if (typeof data == "string") data = new Buffer(data, "hex");
+    if (typeof data == "string") data = Buffer.from(data, "hex");
     var tea = new TEA();
     tea.key = this.genkey(uid);
     var buf = tea.decrypt(data);
     return buf.readUInt32LE(0);
   }
   scramble(uid, cnt) {
-    var base = new Buffer([
+    var base = Buffer.fromr([
       0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xb7, 0xd5, 0xd7, 0xe6, 0xe7,
       0xba, 0x3c, 0xa8, 0xd8, 0x75, 0x47, 0x68, 0xcf, 0x23, 0xe9, 0xfe, 0xaa,
     ]);
-    uid = new Buffer(uid, "hex");
+    uid = Buffer.from(uid, "hex");
     uid.copy(base);
     base[cnt * 4 - 1] = 0xaa;
     // base[30] = base[31] = 0xAA
@@ -57,13 +57,14 @@ export default class CharCrypto {
       }
     }
 
-    var b = new Buffer(4);
+    var b = Buffer.allocUnsafe(4);
     b.writeUInt32LE(v2, 0);
     return b.toString("hex");
   }
 }
 function flipBytes(buf) {
-  var out = new Buffer(buf.length);
+  //TODO: This can be optimized
+  var out = Buffer.Unsafe(buf.length);
   for (var i = 0; i < buf.length; i += 4)
     out.writeUInt32BE(buf.readUInt32LE(i) >>> 0, i);
   return out;

@@ -18,7 +18,7 @@ export default class Request {
 
   build() {
     this.frame = this.frame || new Frame();
-    var b = new Buffer(this.payload.length + 2);
+    var b = Buffer.allocUnsafe(this.payload.length + 2);
     b[0] = this.cmd;
     b[1] = this.cid;
     this.payload.copy(b, 2);

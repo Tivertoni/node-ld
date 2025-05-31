@@ -18,13 +18,13 @@ RawTransport.prototype.write = function (buffer) {
 };
 
 function dataBuffer(cb) {
-  var buf = new Buffer(1024);
+  var buf = Buffer.alloc(1024);
   var ind = 0;
   return function (data) {
     data.copy(buf, ind);
     ind += data.length;
     while (ind >= 0x20) {
-      var b = new Buffer(0x20);
+      var b = Buffer.alloc(0x20);
       buf.copy(b, 0);
       cb("data", b);
       buf.copy(buf, 0, 0x20);

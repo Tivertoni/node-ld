@@ -15,7 +15,7 @@ export default class Response {
 
   build() {
     this.frame = this.frame || new Frame();
-    var b = new Buffer(this.payload.length + 1);
+    var b = Buffer.allocUnsafe(this.payload.length + 1);
     b[0] = this.cid;
     this.payload.copy(b, 1);
     this.frame.type = 0x55;
